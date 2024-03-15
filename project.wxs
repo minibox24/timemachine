@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           Language="1042"
+           Manufacturer="minibox"
+           Name="타임머신"
+           UpgradeCode="532a30f5-e8cb-4868-9569-554def59a136"
+           Version="1.0.0">
+
+    <Package InstallScope="perMachine" Compressed="yes" />
+
+    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="ProductIcon" SourceFile="egg.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="ProductIcon" />
+    <WixVariable Id="WixUILicenseRtf" Value="LICENSE.rtf" />
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="프로그램 실행하기" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1"/>
+    <Property Id="WixShellExecTarget" Value="[!ProgramPath]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="TimeMachine">
+          <Component Id="ProgramPath" Guid="*">
+            <File Id="ProgramPath" KeyPath="yes" Source="$(var.ProgramPath)" />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <!-- Add Desktop folder -->
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="DesktopShortcutComponent" Guid="9d407045-76d4-4773-9708-dd8086b7265a">
+          <Shortcut Id="DesktopShortcut" Name="타임머신" Description="딸깍" Directory="DesktopFolder" Target="[INSTALLFOLDER]/timemachine.exe" WorkingDirectory="INSTALLFOLDER" />
+        </Component>
+      </Directory>
+
+      <!-- Add ProgramMenuFolder -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="TimeMachine">
+          <Component Id="StartMenuShortcutComponent" Guid="0fa4d6ea-4f6e-4797-9b2d-2372fb5a2420">
+            <Shortcut Id="StartMenuShortcut" Name="타임머신" Description="딸깍" Target="[INSTALLFOLDER]/timemachine.exe" Directory="ApplicationProgramsFolder" WorkingDirectory="INSTALLFOLDER" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id="MainFeature" Title="Main Feature" Level="1">
+      <ComponentGroupRef Id="TimeMachineComponent"/>
+      <ComponentRef Id="ProgramPath"/>
+      
+      <!-- Add reference to the desktop shortcut component -->
+      <ComponentRef Id="DesktopShortcutComponent"/>
+      <!-- Add reference to the start menu shortcut component -->
+      <ComponentRef Id="StartMenuShortcutComponent"/>
+    </Feature>
+
+    <UI>
+      <UIRef Id="WixUI_Minimal" />
+
+      <Publish Dialog="ExitDialog" 
+          Control="Finish" 
+          Event="DoAction" 
+          Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+  </Product>
+</Wix>

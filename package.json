@@ -1,0 +1,11 @@
+{
+  "name": "timemachine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "pyinstaller main.py --name timemachine --icon=egg.ico --noconfirm",
+    "package": "powershell ./package.ps1",
+    "publish": "npm run build && npm run package"
+  }
+}
